@@ -9,6 +9,7 @@ const connectDB = require("./db/connect");
 
 const authRouter = require("./routes/auth");
 const collectionsRouter = require("./routes/collection");
+const itemsRouter = require("./routes/item");
 
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
@@ -18,6 +19,7 @@ app.use(cors());
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/collections", collectionsRouter);
+app.use("/api/v1/items", itemsRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
