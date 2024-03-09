@@ -2,12 +2,19 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const { StatusCodes } = require("http-status-codes");
 
+const {
+  BadRequestError,
+  UnauthenticatedError,
+  NotFoundError,
+} = require("../errors");
+
 const register = async (req, res) => {
   const user = await User.create({ ...req.body });
   const token = user.createJWT();
-  res
-    .status(StatusCodes.CREATED)
-    .json({ user: { username: user.username, userId: user._id }, token });
+  res.status(StatusCodes.CREATED).json({
+    user: { username: user.username, userId: user._id, role: user.role },
+    token,
+  });
 };
 
 const login = async (req, res) => {
@@ -36,9 +43,10 @@ const login = async (req, res) => {
   }
 
   const token = user.createJWT();
-  res
-    .status(StatusCodes.OK)
-    .json({ user: { name: user.username, userId: user._id }, token });
+  res.status(StatusCodes.OK).json({
+    user: { name: user.username, userId: user._id, role: user.role },
+    token,
+  });
 };
 
 const blockUser = async (req, res) => {
