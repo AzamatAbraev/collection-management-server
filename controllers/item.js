@@ -26,6 +26,17 @@ const getAllItems = async (req, res) => {
   }
 };
 
+const getLatestItems = async (req, res) => {
+  try {
+    const items = await Item.find({}).sort({ createdAt: -1 }).limit(8);
+    res.status(StatusCodes.OK).json(items);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
+  }
+};
+
 const getSingleItem = async (req, res) => {
   try {
     const item = await Item.findById(req.params.id);
@@ -97,10 +108,35 @@ const deleteItem = async (req, res) => {
   }
 };
 
+const searchItems = async (req, res) => {
+  const { query } = req.query;
+
+  if (!query) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ message: "Please provide a search query" });
+  }
+
+  try {
+    const items = await Item.find(
+      { $text: { $search: query } },
+      { score: { $meta: "textScore" } },
+    ).sort({ score: { $meta: "textScore" } });
+
+    res.status(StatusCodes.OK).json(items);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
+  }
+};
+
 module.exports = {
   createItem,
   getAllItems,
+  getLatestItems,
   getSingleItem,
   updateItem,
   deleteItem,
+  searchItems,
 };
