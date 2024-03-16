@@ -10,6 +10,7 @@ const {
   deleteCollection,
   getSingleCollection,
   getCollectionsByUser,
+  deleteItemsByCollectionId,
 } = require("../controllers/collection");
 
 router.get("/", getAllCollections);
@@ -18,5 +19,10 @@ router.get("/:id", getSingleCollection);
 router.post("/", authenticateUser, createCollection);
 router.patch("/:id", authenticateUser, updateCollection);
 router.delete("/:id", authenticateUser, deleteCollection);
+router.delete(
+  "/by-collection/:id",
+  authenticateUser,
+  deleteItemsByCollectionId,
+);
 
 module.exports = router;

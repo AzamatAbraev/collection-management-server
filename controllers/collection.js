@@ -1,4 +1,5 @@
 const Collection = require("../models/Collection");
+const Item = require("../models/Item");
 const { StatusCodes } = require("http-status-codes");
 
 const createCollection = async (req, res) => {
@@ -91,7 +92,8 @@ const updateCollection = async (req, res) => {
 
 const deleteCollection = async (req, res) => {
   try {
-    const collection = await Collection.findById(req.params.id);
+    const collectionId = req.params.id;
+    const collection = await Collection.findById(collectionId);
     if (!collection) {
       return res
         .status(StatusCodes.NOT_FOUND)
@@ -107,8 +109,30 @@ const deleteCollection = async (req, res) => {
         .json({ message: "Not authorized to delete this collection" });
     }
 
-    await Collection.deleteOne({ _id: req.params.id });
+    const items = await Item.find({ collectionId: collectionId });
+    if (items.length > 0) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message:
+          "Cannot delete collection when it has items. Please delete all items first",
+      });
+    }
+
+    await Collection.deleteOne({ _id: collectionId });
     res.json({ message: "Deleted Collection" });
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
+  }
+};
+
+const deleteItemsByCollectionId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await Item.deleteMany({ collectionId: id });
+    res
+      .status(StatusCodes.OK)
+      .json({ message: `Deleted ${result.deletedCount} items.` });
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -122,5 +146,6 @@ module.exports = {
   getCollectionsByUser,
   updateCollection,
   deleteCollection,
+  deleteItemsByCollectionId,
   getSingleCollection,
 };
