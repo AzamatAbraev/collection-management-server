@@ -13,13 +13,11 @@ const {
 const isAdmin = require("../middleware/isAdmin");
 const authenticateUser = require("../middleware/authentication");
 
-router.use(authenticateUser);
-
-router.get("/", isAdmin, getAllUsers);
-router.get("/:userId", isAdmin, getUserById);
-router.patch("/:userId/block", isAdmin, blockUser);
-router.patch("/:userId/unblock", isAdmin, unblockUser);
-router.delete("/:userId", isAdmin, deleteUser);
-router.patch("/:userId/role", isAdmin, updateRole);
+router.get("/", authenticateUser, isAdmin, getAllUsers);
+router.get("/:userId", getUserById);
+router.patch("/:userId/block", authenticateUser, isAdmin, blockUser);
+router.patch("/:userId/unblock", authenticateUser, isAdmin, unblockUser);
+router.delete("/:userId", authenticateUser, isAdmin, deleteUser);
+router.patch("/:userId/role", authenticateUser, isAdmin, updateRole);
 
 module.exports = router;
