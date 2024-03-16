@@ -107,7 +107,7 @@ const deleteCollection = async (req, res) => {
         .json({ message: "Not authorized to delete this collection" });
     }
 
-    await collection.remove();
+    await Collection.deleteOne({ _id: req.params.id });
     res.json({ message: "Deleted Collection" });
   } catch (error) {
     res

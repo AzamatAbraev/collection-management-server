@@ -107,7 +107,7 @@ const deleteItem = async (req, res) => {
         .json({ message: "Not authorized to delete this item" });
     }
 
-    await item.remove();
+    await item.deleteOne({ _id: req.params.id });
     res.json({ message: "Deleted Item" });
   } catch (error) {
     res
