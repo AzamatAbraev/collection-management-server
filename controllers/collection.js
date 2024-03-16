@@ -99,8 +99,8 @@ const deleteCollection = async (req, res) => {
     }
 
     if (
-      collection.userId.toString() !== req.user._id &&
-      !req.user.role !== "admin"
+      collection.userId.toString() !== req.user.userId &&
+      req.user.role !== "admin"
     ) {
       return res
         .status(StatusCodes.FORBIDDEN)
