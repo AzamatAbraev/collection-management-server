@@ -44,7 +44,7 @@ const getSingleCollection = async (req, res) => {
 };
 
 const getCollectionsByUser = async (req, res) => {
-  const userId = req.query.userId || req.user.userId;
+  const userId = req.user.userId;
 
   try {
     const collections = await Collection.find({ userId: userId });
