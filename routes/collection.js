@@ -13,8 +13,8 @@ const {
 } = require("../controllers/collection");
 
 router.get("/", getAllCollections);
+router.get("/", authenticateUser, getCollectionsByUser);
 router.get("/:id", getSingleCollection);
-router.get("/user", authenticateUser, getCollectionsByUser);
 router.post("/", authenticateUser, createCollection);
 router.patch("/:id", authenticateUser, updateCollection);
 router.delete("/:id", authenticateUser, deleteCollection);
