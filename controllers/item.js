@@ -5,6 +5,7 @@ const createItem = async (req, res) => {
   const item = new Item({
     ...req.body,
     userId: req.user.userId,
+    collectionId: req.body.collectionId,
   });
 
   try {
@@ -16,8 +17,15 @@ const createItem = async (req, res) => {
 };
 
 const getAllItems = async (req, res) => {
+  const { collectionId } = req.query;
+
   try {
-    const items = await Item.find();
+    let query = {};
+    if (collectionId) {
+      query.collectionId = collectionId;
+    }
+
+    const items = await Item.find(query);
     res.json(items);
   } catch (error) {
     res
