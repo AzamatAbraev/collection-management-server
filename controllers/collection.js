@@ -43,6 +43,19 @@ const getSingleCollection = async (req, res) => {
   }
 };
 
+const getCollectionsByUser = async (req, res) => {
+  const userId = req.user.userId;
+
+  try {
+    const collections = await Collection.find({ userId: userId });
+    res.json(collections);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
+  }
+};
+
 const updateCollection = async (req, res) => {
   try {
     const { id } = req.params;
@@ -106,6 +119,7 @@ const deleteCollection = async (req, res) => {
 module.exports = {
   createCollection,
   getAllCollections,
+  getCollectionsByUser,
   updateCollection,
   deleteCollection,
   getSingleCollection,
