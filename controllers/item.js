@@ -2,6 +2,12 @@ const Item = require("../models/Item");
 const { StatusCodes } = require("http-status-codes");
 
 const createItem = async (req, res) => {
+  if (!req.user) {
+    return res.status(StatusCodes.UNAUTHORIZED).json({
+      message: "Only authors can create new items inside their collection",
+    });
+  }
+
   const item = new Item({
     ...req.body,
     userId: req.user.userId,
