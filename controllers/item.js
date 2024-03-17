@@ -1,17 +1,34 @@
 const Item = require("../models/Item");
+const Collection = require("../models/Collection");
 const { StatusCodes } = require("http-status-codes");
 
 const createItem = async (req, res) => {
   if (!req.user) {
-    return res.status(StatusCodes.UNAUTHORIZED).json({
-      message: "Only authors can create new items inside their collection",
-    });
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ message: "Authentication required" });
+  }
+
+  const collection = await Collection.findById(req.body.collectionId);
+
+  if (!collection) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ message: "Collection not found" });
+  }
+
+  if (
+    collection.userId.toString() !== req.user.userId &&
+    req.user.role !== "admin"
+  ) {
+    return res
+      .status(StatusCodes.FORBIDDEN)
+      .json({ message: "Not authorized to create items in this collection" });
   }
 
   const item = new Item({
     ...req.body,
     userId: req.user.userId,
-    collectionId: req.body.collectionId,
   });
 
   try {
