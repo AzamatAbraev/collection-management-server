@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const Collection = require("./Collection");
+const Item = require("./Item");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -57,5 +59,13 @@ UserSchema.methods.comparePassword = async function (candidatePassword) {
   const isMatch = await bcrypt.compare(candidatePassword, this.password);
   return isMatch;
 };
+
+UserSchema.pre("remove", async function (next) {
+  await Promise.all([
+    Collection.deleteMany({ userId: this._id }),
+    Item.deleteMany({ userId: this._id }),
+  ]);
+  next();
+});
 
 module.exports = mongoose.model("User", UserSchema);

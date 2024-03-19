@@ -31,7 +31,6 @@ const getUserById = async (req, res) => {
   }
 };
 
-
 const blockUser = async (req, res) => {
   const { userId } = req.params;
   const userCheck = await User.findById(userId);
@@ -70,9 +69,11 @@ const deleteUser = async (req, res) => {
   const { userId } = req.params;
   const user = await User.findByIdAndDelete(userId);
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    return res
+      .status(StatusCodes.NOT_FOUND)
+      .json({ message: "User not found" });
   }
-  res.status(200).json({ message: "User deleted successfully" });
+  res.status(StatusCodes.OK).json({ message: "User deleted successfully" });
 };
 
 const updateRole = async (req, res) => {
@@ -90,4 +91,11 @@ const updateRole = async (req, res) => {
   res.status(200).json({ message: `User role updated to ${newRole}`, user });
 };
 
-module.exports = { getAllUsers, getUserById, blockUser, unblockUser, deleteUser, updateRole };
+module.exports = {
+  getAllUsers,
+  getUserById,
+  blockUser,
+  unblockUser,
+  deleteUser,
+  updateRole,
+};
