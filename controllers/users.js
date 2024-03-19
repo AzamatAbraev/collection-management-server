@@ -50,6 +50,46 @@ const blockUser = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: "User blocked successfully" });
 };
 
+const updateUser = async (req, res) => {
+  const { userId } = req.params;
+  const updateData = req.body;
+
+  try {
+    const allowedUpdates = ["username", "email", "status", "role"];
+    const updates = Object.keys(updateData);
+    const isValidOperation = updates.every((update) =>
+      allowedUpdates.includes(update),
+    );
+
+    if (!isValidOperation) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "Invalid updates!" });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new NotFoundError(`No user with id ${userId}`);
+    }
+
+    updates.forEach((update) => (user[update] = updateData[update]));
+    await user.save();
+
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "User updated successfully", user });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
+    } else {
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
+    }
+  }
+};
+
 const unblockUser = async (req, res) => {
   const { userId } = req.params;
   const userCheck = await User.findById(userId);
@@ -102,6 +142,7 @@ const updateRole = async (req, res) => {
 module.exports = {
   getAllUsers,
   getUserById,
+  updateUser,
   blockUser,
   unblockUser,
   deleteUser,
