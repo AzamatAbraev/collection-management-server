@@ -60,35 +60,4 @@ UserSchema.methods.comparePassword = async function (candidatePassword) {
   return isMatch;
 };
 
-UserSchema.pre(
-  "deleteOne",
-  { document: false, query: true },
-  async function (next) {
-    const doc = await this.model.findOne(this.getFilter());
-    if (doc) {
-      await Promise.all([
-        Collection.deleteMany({ userId: doc._id }),
-        Item.deleteMany({ userId: doc._id }),
-      ]);
-    }
-    next();
-  },
-);
-
-UserSchema.pre(
-  "deleteMany",
-  { document: false, query: true },
-  async function (next) {
-    const docs = await this.model.find(this.getFilter());
-    const userIds = docs.map((doc) => doc._id);
-    if (userIds.length > 0) {
-      await Promise.all([
-        Collection.deleteMany({ userId: { $in: userIds } }),
-        Item.deleteMany({ userId: { $in: userIds } }),
-      ]);
-    }
-    next();
-  },
-);
-
 module.exports = mongoose.model("User", UserSchema);

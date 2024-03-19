@@ -1,4 +1,6 @@
 const User = require("../models/User");
+const Collection = require("../models/Collection");
+const Item = require("../models/Item");
 const { StatusCodes } = require("http-status-codes");
 
 const { BadRequestError, NotFoundError } = require("../errors");
@@ -45,7 +47,7 @@ const blockUser = async (req, res) => {
   if (!user) {
     throw new NotFoundError(`No user with id ${userId}`);
   }
-  res.status(StatusCodes.OK).json({ msg: "User blocked successfully" });
+  res.status(StatusCodes.OK).json({ message: "User blocked successfully" });
 };
 
 const unblockUser = async (req, res) => {
@@ -62,7 +64,7 @@ const unblockUser = async (req, res) => {
   if (!user) {
     throw new NotFoundError(`No user with id ${userId}`);
   }
-  res.status(StatusCodes.OK).json({ msg: "User unblocked successfully" });
+  res.status(StatusCodes.OK).json({ message: "User unblocked successfully" });
 };
 
 const deleteUser = async (req, res) => {
@@ -73,6 +75,12 @@ const deleteUser = async (req, res) => {
       .status(StatusCodes.NOT_FOUND)
       .json({ message: "User not found" });
   }
+
+  await Promise.all([
+    Collection.deleteMany({ userId: userId }),
+    Item.deleteMany({ userId: userId }),
+  ]);
+
   res.status(StatusCodes.OK).json({ message: "User deleted successfully" });
 };
 
