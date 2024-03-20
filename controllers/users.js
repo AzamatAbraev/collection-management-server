@@ -6,8 +6,20 @@ const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, NotFoundError } = require("../errors");
 
 const getAllUsers = async (req, res) => {
+  const { query } = req.query;
+
+  let filter = {};
+
+  if (query) {
+    filter = {
+      $or: [
+        { username: new RegExp(query, "i") },
+        { email: new RegExp(query, "i") },
+      ],
+    };
+  }
   try {
-    const users = await User.find({});
+    const users = await User.find(filter);
     res.status(StatusCodes.OK).json(users);
   } catch (error) {
     res

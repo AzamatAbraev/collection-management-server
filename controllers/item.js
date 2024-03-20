@@ -40,12 +40,16 @@ const createItem = async (req, res) => {
 };
 
 const getAllItems = async (req, res) => {
-  const { collectionId } = req.query;
+  const { collectionId, searchQuery } = req.query;
 
   try {
     let query = {};
     if (collectionId) {
       query.collectionId = collectionId;
+    }
+
+    if (searchQuery) {
+      query.$or = [{ name: new RegExp(searchQuery, "i") }];
     }
 
     const items = await Item.find(query);

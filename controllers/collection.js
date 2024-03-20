@@ -17,8 +17,20 @@ const createCollection = async (req, res) => {
 };
 
 const getAllCollections = async (req, res) => {
+  const { query } = req.query;
+
+  let filter = {};
+
+  if (query) {
+    filter = {
+      $or: [
+        { name: new RegExp(query, "i") },
+        { description: new RegExp(query, "i") },
+      ],
+    };
+  }
   try {
-    const collections = await Collection.find();
+    const collections = await Collection.find(filter);
     res.json(collections);
   } catch (error) {
     res
