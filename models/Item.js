@@ -9,6 +9,7 @@ const itemSchema = new mongoose.Schema(
       ref: "Collection",
       required: true,
     },
+    photo: { type: String, required: false },
     customValues: mongoose.Schema.Types.Mixed,
     userId: {
       type: mongoose.Schema.Types.ObjectId,

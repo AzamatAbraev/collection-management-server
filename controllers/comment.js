@@ -2,6 +2,17 @@ const Comment = require("../models/Comment");
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 
+const getAllComments = async (req, res) => {
+  try {
+    const comments = await Comment.find();
+    res.json(comments);
+  } catch {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
+  }
+};
+
 const addComment = async (req, res) => {
   const { itemId } = req.params;
   const { content } = req.body;
@@ -41,4 +52,5 @@ const getCommentsByItemId = async (req, res) => {
 module.exports = {
   addComment,
   getCommentsByItemId,
+  getAllComments,
 };

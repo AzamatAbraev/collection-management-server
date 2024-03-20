@@ -16,9 +16,9 @@ const {
 router.get("/search", searchItems);
 
 router.get("/", getAllItems);
+router.post("/", authenticateUser, createItem);
 router.get("/latest", getLatestItems);
 router.get("/:id", getSingleItem);
-router.post("/", authenticateUser, createItem);
 router.patch("/:id", authenticateUser, updateItem);
 router.delete("/:id", authenticateUser, deleteItem);
 
