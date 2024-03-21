@@ -2,7 +2,6 @@ const Item = require("../models/Item");
 const Collection = require("../models/Collection");
 const { StatusCodes } = require("http-status-codes");
 
-
 const createItem = async (req, res) => {
   if (!req.user) {
     return res
@@ -31,10 +30,6 @@ const createItem = async (req, res) => {
     ...req.body,
     userId: req.user.userId,
   };
-
-  // if (req.file && req.file.cloudStoragePublicUrl) {
-  //   itemData.photo = req.file.cloudStoragePublicUrl;
-  // }
 
   const item = new Item(itemData);
 

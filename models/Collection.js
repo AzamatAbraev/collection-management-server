@@ -21,4 +21,6 @@ const collectionSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+collectionSchema.index({ name: "text", description: "text" });
+
 module.exports = mongoose.model("Collection", collectionSchema);
