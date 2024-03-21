@@ -27,7 +27,7 @@ const uploadImageToGCS = (file) => {
     });
 
     blobStream.on("error", (error) => {
-      reject("Something is wrong! Unable to upload at the moment.");
+      reject("Something is wrong! Unable to upload at the moment." + error);
     });
 
     blobStream.on("finish", () => {
