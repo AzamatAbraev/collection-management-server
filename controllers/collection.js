@@ -17,9 +17,13 @@ const createCollection = async (req, res) => {
 };
 
 const getAllCollections = async (req, res) => {
-  const { query } = req.query;
+  const { query, category } = req.query;
 
   let filter = {};
+
+  if (category) {
+    filter.category = category;
+  }
 
   if (query) {
     filter = {
@@ -58,9 +62,25 @@ const getSingleCollection = async (req, res) => {
 
 const getCollectionsByUser = async (req, res) => {
   const userId = req.user.userId;
+  const { query, category } = req.query;
+
+  let filter = { userId: userId };
+
+  if (category) {
+    filter.category = category;
+  }
+
+  if (query) {
+    filter = {
+      $or: [
+        { name: new RegExp(query, "i") },
+        { description: new RegExp(query, "i") },
+      ],
+    };
+  }
 
   try {
-    const collections = await Collection.find({ userId: userId });
+    const collections = await Collection.find(filter);
     res.json(collections);
   } catch (error) {
     res
