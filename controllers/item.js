@@ -110,6 +110,7 @@ const updateItem = async (req, res) => {
 
     item.name = req.body.name ?? item.name;
     item.tags = req.body.tags ?? item.tags;
+    item.photo = req.body.photo ?? item.photo;
 
     const updatedItem = await item.save();
     res.json(updatedItem);

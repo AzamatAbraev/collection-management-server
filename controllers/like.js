@@ -1,6 +1,22 @@
 const Like = require("../models/Like");
 const { StatusCodes } = require("http-status-codes");
 
+const getItemLikes = async (req, res) => {
+  const { itemId } = req.params;
+  const userId = req.user.userId;
+
+  try {
+    const likeCount = await Like.countDocuments({ itemId });
+    const likedByUser = (await Like.findOne({ itemId, userId })) != null;
+
+    res.json({ likeCount, likedByUser });
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
+  }
+};
+
 const likeItem = async (req, res) => {
   const { itemId } = req.params;
   const userId = req.user.userId;
