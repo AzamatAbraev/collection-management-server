@@ -1,5 +1,6 @@
 const Item = require("../models/Item");
 const Collection = require("../models/Collection");
+const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 
 const createItem = async (req, res) => {

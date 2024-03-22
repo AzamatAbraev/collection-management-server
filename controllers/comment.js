@@ -49,8 +49,70 @@ const getCommentsByItemId = async (req, res) => {
   }
 };
 
+const updateComment = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+      return res
+        .send(StatusCodes.NOT_FOUND)
+        .json({ message: "Comment Not Found" });
+    }
+
+    if (
+      comment.userId.toString() !== req.user.userId &&
+      req.user.role !== "admin"
+    ) {
+      return res
+        .status(StatusCodes.FORBIDDEN)
+        .json({ message: "Not authorized to edit the comment" });
+    }
+
+    comment.content = req.body.content ?? comment.content;
+
+    const updatedContent = await comment.save();
+    res.json(updatedContent);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
+  }
+};
+
+const deleteComment = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+      return res
+        .send(StatusCodes.NOT_FOUND)
+        .json({ message: "Comment Not Found" });
+    }
+
+    if (
+      comment.userId.toString() !== req.user.userId &&
+      req.user.role !== "admin"
+    ) {
+      return res
+        .status(StatusCodes.FORBIDDEN)
+        .json({ message: "Not authorized to delete the comment" });
+    }
+
+    await comment.deleteOne({ _id: commentId });
+    res.json({ message: "Comment deleted" });
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
+  }
+};
+
 module.exports = {
-  addComment,
   getCommentsByItemId,
   getAllComments,
+  addComment,
+  deleteComment,
+  updateComment,
 };

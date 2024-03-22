@@ -14,7 +14,7 @@ const {
 const isAdmin = require("../middleware/isAdmin");
 const authenticateUser = require("../middleware/authentication");
 
-router.get("/", authenticateUser, isAdmin, getAllUsers);
+router.get("/", authenticateUser, getAllUsers);
 router.get("/:userId", getUserById);
 router.patch("/:userId", authenticateUser, isAdmin, updateUser);
 router.patch("/:userId/block", authenticateUser, isAdmin, blockUser);
