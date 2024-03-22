@@ -76,7 +76,10 @@ const getLatestItems = async (req, res) => {
 
 const getSingleItem = async (req, res) => {
   try {
-    const item = await Item.findById(req.params.id);
+    const item = await Item.findById(req.params.id).populate(
+      "likes",
+      "username",
+    );
     if (!item) {
       return res
         .status(StatusCodes.NOT_FOUND)
@@ -169,6 +172,43 @@ const searchItems = async (req, res) => {
   }
 };
 
+const likeItem = async (req, res) => {
+  try {
+    const item = await Item.findById(req.params.id);
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    const alreadyLiked = item.likes.includes(req.user.userId);
+    if (!alreadyLiked) {
+      item.likes.push(req.user.userId);
+      await item.save();
+      return res.status(200).json({ message: "Liked the item" });
+    }
+
+    res.status(400).json({ message: "Item already liked" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const unlikeItem = async (req, res) => {
+  try {
+    const item = await Item.findById(req.params.id);
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    item.likes = item.likes.filter(
+      (userId) => userId.toString() !== req.user.userId,
+    );
+    await item.save();
+    res.status(200).json({ message: "Unliked the item" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createItem,
   getAllItems,
@@ -177,4 +217,6 @@ module.exports = {
   updateItem,
   deleteItem,
   searchItems,
+  likeItem,
+  unlikeItem,
 };

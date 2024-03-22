@@ -11,6 +11,8 @@ const {
   deleteItem,
   searchItems,
   getLatestItems,
+  likeItem,
+  unlikeItem,
 } = require("../controllers/item");
 
 router.get("/search", searchItems);
@@ -21,5 +23,8 @@ router.get("/latest", getLatestItems);
 router.get("/:id", getSingleItem);
 router.patch("/:id", authenticateUser, updateItem);
 router.delete("/:id", authenticateUser, deleteItem);
+
+router.patch("/:id/like", authenticateUser, likeItem);
+router.patch("/:id/unlike", authenticateUser, unlikeItem);
 
 module.exports = router;
