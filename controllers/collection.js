@@ -115,6 +115,10 @@ const updateCollection = async (req, res) => {
       collection.description = req.body.description;
     }
 
+    if (req.body.category != null) {
+      collection.category = req.body.category;
+    }
+
     const updatedCollection = await collection.save();
     res.json(updatedCollection);
   } catch (error) {
