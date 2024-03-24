@@ -17,6 +17,7 @@ const searchRouter = require("./routes/search");
 
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
+const { getAllComments } = require("./controllers/comment");
 
 app.use(express.json());
 app.use(cors());
@@ -28,6 +29,8 @@ app.use("/api/v1/items", commentsRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/upload", uploadRouter);
 app.use("/api/v1/search", searchRouter);
+
+app.get("/api/v1/comments", getAllComments);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

@@ -11,7 +11,7 @@ const itemSchema = new mongoose.Schema(
     },
     photo: { type: String, required: false },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    customValues: mongoose.Schema.Types.Mixed,
+    customValues: { type: Map, of: mongoose.Schema.Types.Mixed },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

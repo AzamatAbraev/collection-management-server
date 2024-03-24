@@ -1,10 +1,13 @@
 const Comment = require("../models/Comment");
 const User = require("../models/User");
+const Item = require("../models/Item");
 const { StatusCodes } = require("http-status-codes");
 
 const getAllComments = async (req, res) => {
   try {
-    const comments = await Comment.find();
+    const comments = await Comment.find({})
+      .populate("userId", "username")
+      .sort({ createdAt: -1 });
     res.json(comments);
   } catch {
     res

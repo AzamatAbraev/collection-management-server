@@ -19,7 +19,7 @@ const getAllUsers = async (req, res) => {
     };
   }
   try {
-    const users = await User.find(filter);
+    const users = await User.find(filter).sort("-createdAt");
     res.status(StatusCodes.OK).json(users);
   } catch (error) {
     res

@@ -2,10 +2,24 @@ const Collection = require("../models/Collection");
 const Item = require("../models/Item");
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
+const {
+  validateCustomFieldDefinitions,
+} = require("../middleware/validateDefinitions");
 
 const createCollection = async (req, res) => {
+  const { name, description, category, customFields } = req.body;
+
+  const validationErrors = [];
+  if (!validateCustomFieldDefinitions(customFields, validationErrors)) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ message: "Validation error", errors: validationErrors });
+  }
   const collection = new Collection({
-    ...req.body,
+    name,
+    description,
+    category,
+    customFields,
     userId: req.user.userId,
   });
 

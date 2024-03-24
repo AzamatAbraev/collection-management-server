@@ -2,15 +2,18 @@ const Item = require("../models/Item");
 const Collection = require("../models/Collection");
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
+const { validateCustomFields } = require("../middleware/validateCustomValues");
 
 const createItem = async (req, res) => {
+  const { collectionId, name, tags, customValues } = req.body;
+
   if (!req.user) {
     return res
       .status(StatusCodes.UNAUTHORIZED)
       .json({ message: "Authentication required" });
   }
 
-  const collection = await Collection.findById(req.body.collectionId);
+  const collection = await Collection.findById(collectionId);
 
   if (!collection) {
     return res
@@ -27,8 +30,24 @@ const createItem = async (req, res) => {
       .json({ message: "Not authorized to create items in this collection" });
   }
 
+  const validationErrors = [];
+  if (
+    !validateCustomFields(
+      customValues,
+      collection.customFields,
+      validationErrors,
+    )
+  ) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ message: "Validation error", errors: validationErrors });
+  }
+
   const itemData = {
-    ...req.body,
+    name,
+    tags,
+    collectionId,
+    customValues,
     userId: req.user.userId,
   };
 
@@ -59,7 +78,9 @@ const getAllItems = async (req, res) => {
       query.$or = [{ name: new RegExp(searchQuery, "i") }];
     }
 
-    const items = await Item.find(query);
+    const items = await Item.find(query)
+      .populate("userId", "username")
+      .populate("collectionId", "name");
     res.json(items);
   } catch (error) {
     res
@@ -70,7 +91,11 @@ const getAllItems = async (req, res) => {
 
 const getLatestItems = async (req, res) => {
   try {
-    const items = await Item.find({}).sort({ createdAt: -1 }).limit(8);
+    const items = await Item.find({})
+      .populate("userId", "username")
+      .populate("collectionId", "name")
+      .sort({ createdAt: -1 })
+      .limit(8);
     res.status(StatusCodes.OK).json(items);
   } catch (error) {
     res

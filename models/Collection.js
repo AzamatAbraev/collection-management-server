@@ -9,7 +9,11 @@ const collectionSchema = new mongoose.Schema(
     itemCount: Number,
     customFields: [
       {
-        fieldType: { type: String, required: true },
+        fieldType: {
+          type: String,
+          enum: ["Integer", "String", "Text", "Boolean", "Date"],
+          required: true,
+        },
         fieldName: { type: String, required: true },
       },
     ],
