@@ -11,9 +11,11 @@ const {
   getSingleCollection,
   getCollectionsByUser,
   deleteItemsByCollectionId,
+  getLargestCollections,
 } = require("../controllers/collection");
 
 router.get("/", getAllCollections);
+router.get("/largest", getLargestCollections);
 router.get("/user", authenticateUser, getCollectionsByUser);
 router.get("/:id", getSingleCollection);
 router.post("/", authenticateUser, createCollection);

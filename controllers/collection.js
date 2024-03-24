@@ -1,5 +1,6 @@
 const Collection = require("../models/Collection");
 const Item = require("../models/Item");
+const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 
 const createCollection = async (req, res) => {
@@ -34,8 +35,38 @@ const getAllCollections = async (req, res) => {
     };
   }
   try {
-    const collections = await Collection.find(filter);
+    const collections = await Collection.find(filter)
+      .populate("userId", "username")
+      .exec();
+    for (let collection of collections) {
+      const itemCount = await Item.countDocuments({
+        collectionId: collection._id,
+      });
+      collection._doc.itemCount = itemCount;
+    }
     res.json(collections);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
+  }
+};
+
+const getLargestCollections = async (req, res) => {
+  try {
+    const largestCollections = await Collection.find({})
+      .populate("userId", "username")
+      .sort({ itemCount: -1 })
+      .limit(5);
+
+    for (let collection of largestCollections) {
+      const itemCount = await Item.countDocuments({
+        collectionId: collection._id,
+      });
+      collection._doc.itemCount = itemCount;
+    }
+
+    res.status(StatusCodes.OK).json(largestCollections);
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -184,4 +215,5 @@ module.exports = {
   deleteCollection,
   deleteItemsByCollectionId,
   getSingleCollection,
+  getLargestCollections,
 };

@@ -6,6 +6,7 @@ const collectionSchema = new mongoose.Schema(
     description: { type: String, required: true },
     category: { type: String, required: true },
     image: String,
+    itemCount: Number,
     customFields: [
       {
         fieldType: { type: String, required: true },

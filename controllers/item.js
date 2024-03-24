@@ -36,6 +36,10 @@ const createItem = async (req, res) => {
 
   try {
     const savedItem = await item.save();
+    await Collection.findByIdAndUpdate(req.body.collectionId, {
+      $inc: { itemCount: 1 },
+    });
+
     res.status(StatusCodes.CREATED).json(savedItem);
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
@@ -142,6 +146,10 @@ const deleteItem = async (req, res) => {
     }
 
     await item.deleteOne({ _id: req.params.id });
+    await Collection.findByIdAndUpdate(item.collectionId, {
+      $inc: { itemCount: -1 },
+    });
+
     res.json({ message: "Deleted Item" });
   } catch (error) {
     res
