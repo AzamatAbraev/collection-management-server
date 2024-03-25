@@ -2,10 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const { StatusCodes } = require("http-status-codes");
 
-const {
-  BadRequestError,
-  UnauthenticatedError,
-} = require("../errors");
+const { BadRequestError, UnauthenticatedError } = require("../errors");
 
 const register = async (req, res) => {
   const user = await User.create({ ...req.body });
@@ -19,8 +16,12 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    throw new BadRequestError("Please provide email and password");
+  if (!email) {
+    throw new BadRequestError("Please provide your email");
+  }
+
+  if (!password) {
+    throw new BadRequestError("Please provide your password");
   }
 
   const user = await User.findOne({ email });
@@ -48,9 +49,41 @@ const login = async (req, res) => {
   });
 };
 
+const changePassword = async (req, res) => {
+  const { userId } = req.user;
+  const { currentPassword, newPassword } = req.body;
 
+  if (!currentPassword) {
+    throw new BadRequestError("Please provide current password");
+  }
+
+  if (!newPassword) {
+    throw new BadRequestError("Please provide current password");
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new UnauthenticatedError("User not found.");
+  }
+
+  const isPasswordCorrect = await user.comparePassword(currentPassword);
+
+  if (!isPasswordCorrect) {
+    throw new UnauthenticatedError("Current password is not correct.");
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  const token = user.createJWT();
+
+  res
+    .status(StatusCodes.OK)
+    .json({ message: "Password changed successfully." });
+};
 
 module.exports = {
   register,
   login,
+  changePassword,
 };
