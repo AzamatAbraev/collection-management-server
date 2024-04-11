@@ -7,10 +7,7 @@ require("express-async-errors");
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: "http://localhost:3000",
-  methods: ["GET", "POST"],
-});
+const io = new Server(server);
 
 const cors = require("cors");
 const connectDB = require("./db/connect");
