@@ -7,7 +7,11 @@ require("express-async-errors");
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
 
 const cors = require("cors");
 const connectDB = require("./db/connect");
