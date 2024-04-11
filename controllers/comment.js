@@ -27,6 +27,8 @@ const addComment = async (req, res) => {
       itemId,
       userId,
     });
+
+    req.io.emit('receiveComment', comment);
     res.status(StatusCodes.CREATED).json(comment);
   } catch (error) {
     res
