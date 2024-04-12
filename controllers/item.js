@@ -44,10 +44,7 @@ const createItem = async (req, res) => {
   }
 
   const itemData = {
-    name,
-    tags,
-    collectionId,
-    customValues,
+    ...req.body,
     userId: req.user.userId,
   };
 
