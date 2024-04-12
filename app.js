@@ -36,6 +36,25 @@ app.use((req, res, next) => {
   next();
 });
 
+io.on("connection", (socket) => {
+  console.log("user connected");
+  socket.on("newComment", (comment) => {
+    socket.broadcast.emit("receiveComment", comment);
+  });
+
+  socket.on("updateComment", (comment) => {
+    socket.broadcast.emit("commentUpdated", comment);
+  })
+
+  socket.on("deleteComment", (commentId) => {
+    socket.broadcast.emit("commentDeleted", commentId);
+  })
+
+  socket.on("disconnect", () => {
+    console.log("A user disconnected");
+  });
+});
+
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/collections", collectionsRouter);
 app.use("/api/v1/items", itemsRouter);
@@ -48,18 +67,6 @@ app.get("/api/v1/comments", getAllComments);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
-
-io.on("connection", (socket) => {
-  console.log("A user connected");
-
-  socket.on("newComment", (comment) => {
-    socket.broadcast.emit("receiveComment", comment);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("A user disconnected");
-  });
-});
 
 const port = process.env.PORT || 3000;
 

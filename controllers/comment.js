@@ -28,8 +28,10 @@ const addComment = async (req, res) => {
       userId,
     });
 
-    req.io.emit('receiveComment', comment);
-    res.status(StatusCodes.CREATED).json(comment);
+    const populatedComment = await comment.populate("userId", "username");
+
+    req.io.emit("receiveComment", populatedComment);
+    res.status(StatusCodes.CREATED).json(populatedComment);
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -77,7 +79,14 @@ const updateComment = async (req, res) => {
     comment.content = req.body.content ?? comment.content;
 
     const updatedContent = await comment.save();
-    res.json(updatedContent);
+
+     const updatedComment = await Comment.findById(commentId).populate(
+       "userId",
+       "username",
+     );
+
+    req.io.emit("commentUpdated", updatedComment);
+    res.json(updatedComment);
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -106,6 +115,7 @@ const deleteComment = async (req, res) => {
     }
 
     await comment.deleteOne({ _id: commentId });
+    req.io.emit("commentDeleted", commentId);
     res.json({ message: "Comment deleted" });
   } catch (error) {
     res
