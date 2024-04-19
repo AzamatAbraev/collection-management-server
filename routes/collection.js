@@ -14,8 +14,10 @@ const {
   getLargestCollections,
 } = require("../controllers/collection");
 
-router.get("/", getAllCollections);
-router.get("/largest", getLargestCollections);
+const cache = require("../routeCache");
+
+router.get("/", cache(300), getAllCollections);
+router.get("/largest", cache(300), getLargestCollections);
 router.get("/user", authenticateUser, getCollectionsByUser);
 router.get("/:id", getSingleCollection);
 router.post("/", authenticateUser, createCollection);

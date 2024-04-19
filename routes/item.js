@@ -15,11 +15,13 @@ const {
   unlikeItem,
 } = require("../controllers/item");
 
+const cache = require("../routeCache");
+
 router.get("/search", searchItems);
 
-router.get("/", getAllItems);
+router.get("/", cache(300), getAllItems);
 router.post("/", authenticateUser, createItem);
-router.get("/latest", getLatestItems);
+router.get("/latest", cache(300), getLatestItems);
 router.get("/:id", getSingleItem);
 router.patch("/:id", authenticateUser, updateItem);
 router.delete("/:id", authenticateUser, deleteItem);

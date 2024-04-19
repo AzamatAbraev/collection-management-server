@@ -33,31 +33,47 @@ const createCollection = async (req, res) => {
 
 const getAllCollections = async (req, res) => {
   const { query, category } = req.query;
-
-  let filter = {};
+  let match = {};
 
   if (category) {
-    filter.category = category;
+    match.category = category;
   }
 
   if (query) {
-    filter = {
-      $or: [
-        { name: new RegExp(query, "i") },
-        { description: new RegExp(query, "i") },
-      ],
-    };
+    match.$or = [
+      { name: new RegExp(query, "i") },
+      { description: new RegExp(query, "i") },
+    ];
   }
+
   try {
-    const collections = await Collection.find(filter)
-      .populate("userId", "username")
-      .exec();
-    for (let collection of collections) {
-      const itemCount = await Item.countDocuments({
-        collectionId: collection._id,
-      });
-      collection._doc.itemCount = itemCount;
-    }
+    const collections = await Collection.aggregate([
+      { $match: match },
+      {
+        $lookup: {
+          from: "Item",
+          localField: "_id",
+          foreignField: "collectionId",
+          as: "Item",
+        },
+      },
+      {
+        $addFields: {
+          itemCount: { $size: "$Item" },
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          description: 1,
+          category: 1,
+          customFields: 1,
+          userId: 1,
+          itemCount: 1,
+        },
+      },
+    ]);
+
     res.json(collections);
   } catch (error) {
     res

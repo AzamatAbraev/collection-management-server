@@ -16,6 +16,7 @@ const io = new Server(server, {
 
 const cors = require("cors");
 const connectDB = require("./db/connect");
+const cache = require("./routeCache");
 
 const authRouter = require("./routes/auth");
 const collectionsRouter = require("./routes/collection");
