@@ -214,6 +214,7 @@ const likeItem = async (req, res) => {
     if (!alreadyLiked) {
       item.likes.push(req.user.userId);
       await item.save();
+      req.io.emit("itemLiked", item);
       return res.status(200).json({ message: "Liked the item" });
     }
 
@@ -234,6 +235,7 @@ const unlikeItem = async (req, res) => {
       (userId) => userId.toString() !== req.user.userId,
     );
     await item.save();
+    req.io.emit("itemUnliked", item);
     res.status(200).json({ message: "Unliked the item" });
   } catch (error) {
     res.status(500).json({ message: error.message });

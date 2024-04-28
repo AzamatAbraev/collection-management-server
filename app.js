@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+const helmet = require("helmet");
 require("express-async-errors");
 
 const app = express();
@@ -30,6 +31,7 @@ const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
 const { getAllComments } = require("./controllers/comment");
 
+app.use(helmet());
 app.use(express.json());
 app.use(cors());
 app.use((req, res, next) => {
@@ -38,7 +40,6 @@ app.use((req, res, next) => {
 });
 
 io.on("connection", (socket) => {
-  console.log("user connected");
   socket.on("newComment", (comment) => {
     socket.broadcast.emit("receiveComment", comment);
   });
@@ -49,6 +50,14 @@ io.on("connection", (socket) => {
 
   socket.on("deleteComment", (commentId) => {
     socket.broadcast.emit("commentDeleted", commentId);
+  })
+
+  socket.on("likeItem", (item) => {
+    socket.broadcast.emit("itemLiked", item);
+  });
+
+  socket.on("unlikeItem", (item) => {
+    socket.broadcast.emit("itemUnliked", item);
   })
 
   socket.on("disconnect", () => {
