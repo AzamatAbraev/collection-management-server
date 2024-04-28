@@ -32,11 +32,6 @@ const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
 const { getAllComments } = require("./controllers/comment");
 
-const apiRequestLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000,
-  max: 3,
-});
-
 app.use(helmet());
 app.use(express.json());
 app.use(cors());
@@ -44,7 +39,6 @@ app.use((req, res, next) => {
   req.io = io;
   next();
 });
-app.use(apiRequestLimiter);
 
 
 io.on("connection", (socket) => {

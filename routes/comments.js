@@ -1,6 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
+const rateLimit = require("express-rate-limit");
+
+const apiRequestLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 3,
+});
+
 const {
   addComment,
   getCommentsByItemId,
