@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const apiRequestLimiter = require("../middleware/rateLimit");
 
 const authenticateUser = require("../middleware/authentication");
 
@@ -20,7 +21,7 @@ const cache = require("../routeCache");
 router.get("/search", searchItems);
 
 router.get("/", cache(300), getAllItems);
-router.post("/", authenticateUser, createItem);
+router.post("/", authenticateUser, apiRequestLimiter, createItem);
 router.get("/latest", cache(300), getLatestItems);
 router.get("/:id", getSingleItem);
 router.patch("/:id", authenticateUser, updateItem);

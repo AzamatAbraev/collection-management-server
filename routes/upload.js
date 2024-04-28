@@ -1,13 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const { uploadImageToGCS } = require("../gcs");
-
-const rateLimit = require("express-rate-limit");
-
-const apiRequestLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000,
-  max: 3,
-});
+const apiRequestLimiter = require("../middleware/rateLimit");
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
