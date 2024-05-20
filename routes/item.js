@@ -20,9 +20,9 @@ const cache = require("../routeCache");
 
 router.get("/search", searchItems);
 
-router.get("/", cache(300), getAllItems);
-router.post("/", authenticateUser, apiRequestLimiter, createItem);
-router.get("/latest", cache(300), getLatestItems);
+router.get("/", getAllItems);
+router.post("/", authenticateUser, createItem);
+router.get("/latest", getLatestItems);
 router.get("/:id", getSingleItem);
 router.patch("/:id", authenticateUser, updateItem);
 router.delete("/:id", authenticateUser, deleteItem);
