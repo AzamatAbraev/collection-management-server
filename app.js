@@ -19,7 +19,6 @@ const io = new Server(server, {
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 const cors = require("cors");
-const rateLimit = require("express-rate-limit");
 const connectDB = require("./db/connect");
 const cache = require("./routeCache");
 

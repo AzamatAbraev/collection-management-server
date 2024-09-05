@@ -1,10 +1,7 @@
 const express = require("express");
-const { uploadImageLocally, multerUpload } = require("../gcs"); // Update this to reflect the change from GCS to local storage
-const apiRequestLimiter = require("../middleware/rateLimit");
+const { uploadImageLocally, multerUpload } = require("../gcs");
 
 const router = express.Router();
-
-router.use(apiRequestLimiter);
 
 router.post("/", multerUpload.single("image"), async (req, res) => {
   try {

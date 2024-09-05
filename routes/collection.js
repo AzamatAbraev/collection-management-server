@@ -3,8 +3,6 @@ const router = express.Router();
 
 const authenticateUser = require("../middleware/authentication");
 
-const apiRequestLimiter = require("../middleware/rateLimit");
-
 const {
   createCollection,
   getAllCollections,
@@ -23,7 +21,7 @@ router.get("/largest", cache(300), getLargestCollections);
 router.get("/user", authenticateUser, getCollectionsByUser);
 router.get("/:id", getSingleCollection);
 
-router.post("/", authenticateUser, apiRequestLimiter, createCollection);
+router.post("/", authenticateUser, createCollection);
 router.patch("/:id", authenticateUser, updateCollection);
 router.delete("/:id", authenticateUser, deleteCollection);
 router.delete(
