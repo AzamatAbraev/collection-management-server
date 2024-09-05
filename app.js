@@ -5,6 +5,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const helmet = require("helmet");
 require("express-async-errors");
+const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
@@ -12,9 +13,11 @@ const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const connectDB = require("./db/connect");
@@ -35,11 +38,11 @@ const { getAllComments } = require("./controllers/comment");
 app.use(helmet());
 app.use(express.json());
 app.use(cors());
+
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
-
 
 io.on("connection", (socket) => {
   socket.on("newComment", (comment) => {
@@ -48,11 +51,11 @@ io.on("connection", (socket) => {
 
   socket.on("updateComment", (comment) => {
     socket.broadcast.emit("commentUpdated", comment);
-  })
+  });
 
   socket.on("deleteComment", (commentId) => {
     socket.broadcast.emit("commentDeleted", commentId);
-  })
+  });
 
   socket.on("likeItem", (item) => {
     socket.broadcast.emit("itemLiked", item);
@@ -60,7 +63,7 @@ io.on("connection", (socket) => {
 
   socket.on("unlikeItem", (item) => {
     socket.broadcast.emit("itemUnliked", item);
-  })
+  });
 
   socket.on("disconnect", () => {
     console.log("A user disconnected");

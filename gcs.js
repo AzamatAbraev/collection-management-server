@@ -1,41 +1,34 @@
-require("dotenv").config();
-const { Storage } = require("@google-cloud/storage");
 const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
-const multerUpload = multer({ storage: multer.memoryStorage() });
+const uploadDirectory = path.join(__dirname, "./uploads");
 
-const storage = new Storage({
-  credentials: JSON.parse(process.env.GCS_CREDENTIALS),
-  projectId: process.env.GCS_PROJECT_ID,
+if (!fs.existsSync(uploadDirectory)) {
+  fs.mkdirSync(uploadDirectory, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDirectory);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
 });
-const bucket = storage.bucket(process.env.GCS_BUCKET_NAME);
 
-const uploadImageToGCS = (file) => {
+const multerUpload = multer({ storage });
+
+const uploadImageLocally = (file) => {
   return new Promise((resolve, reject) => {
     if (!file) {
       reject("No image file");
     }
-    let newFileName = `${Date.now()}-${file.originalname}`;
-
-    let fileUpload = bucket.file(newFileName);
-
-    const blobStream = fileUpload.createWriteStream({
-      metadata: {
-        contentType: file.mimetype,
-      },
-    });
-
-    blobStream.on("error", (error) => {
-      reject("Something is wrong! Unable to upload at the moment." + error);
-    });
-
-    blobStream.on("finish", () => {
-      const url = `https://storage.googleapis.com/${process.env.GCS_BUCKET_NAME}/${newFileName}`;
-      resolve(url);
-    });
-
-    blobStream.end(file.buffer);
+    const fileUrl = `${
+      process.env.BASE_URL || "http://localhost:3000"
+    }/uploads/${file.filename}`;
+    resolve(fileUrl);
   });
 };
 
-module.exports = { uploadImageToGCS };
+module.exports = { uploadImageLocally, multerUpload };
